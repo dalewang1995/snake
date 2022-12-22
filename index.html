@@ -1,0 +1,270 @@
+<!--
+ * @Author: 汪小鱼
+ * @Date: 2022-12-20 15:05:04
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇</title>
+</head>
+<style type="text/css">
+    canvas { border: 2px solid #ddd; }
+    .top-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+  </style>
+<body>
+    <div class="top-panel">
+        <div>得分：<span class="score">0</span></div>
+        <div>
+            <button class="start" onclick="startGame()">重新开始</button>
+        </div>
+    </div>
+    <canvas id="snake" width="594" height="528"></canvas>
+</body>
+<script type="text/javascript">
+
+
+// 1. 随机在空白坐标点生成食物
+// 2. 蛇不能撞墙 碰到自己
+// 3. 每吃一个食物身体长一格
+// 4. 蛇有固定的初始速度
+// 5. 方向的改变用键盘的方向键控制，不能直接往反方向转向
+
+    const canvas = document.getElementById('snake');
+    const ctx = canvas.getContext('2d');
+
+    const canvasHeight = 594
+    const canvasWidth = 528
+
+    // 网格 背景 绘制
+    const maxY = 16
+    const maxX = 18
+    const itemWidth = 33
+
+    // 食物闪烁
+    let flashing = 1
+
+    // 🐍数据的初始化
+    let snake = [
+        [6, 12],
+        [5, 12],
+        [4, 12],
+        [3, 12],
+        [2, 12]
+    ]
+
+    // 蛇速度控制
+    const snakeSpeed = 260
+
+    // 初始分数
+    let initscore = 0
+
+    // 表格坐标计算
+    const grid = []
+
+    for (let i = 0; i < maxX; i++) {
+        for (let j = 0; j < maxY; j++) {
+          grid.push([i, j])
+        } 
+    }
+
+    // 生成食物随机坐标点
+    let food = []
+
+    // 生成随机坐标点
+    const createPos = function() {
+        // 取整获取随机坐标点
+        let [x, y] = grid[(Math.random() * grid.length) | 0]
+
+        // 坐标点不能是蛇内的坐标
+        if (snake.some(v => v[0] === x && v[1] === y)) {
+            return this.createPos()
+        }
+
+        return [x, y]
+    }
+
+    // 生成食物
+    makeFood = function() {
+      food = createPos()
+    }
+
+    makeFood()
+
+    const addScore = function(){
+        const scoreDom = document.querySelector('.score')
+        initscore++
+        scoreDom.innerHTML = initscore
+    }
+
+    const grawGrid = function() {
+        // 绘制 网格 横线
+        for (let i = 1; i < maxY; i++) {
+            ctx.moveTo(0, i * itemWidth)
+            ctx.lineTo(canvasHeight, i * itemWidth)
+        }
+        
+        // 绘制 网格 竖线
+        for (let i = 1; i < maxX; i++) {
+            ctx.moveTo(i * itemWidth, 0)
+            ctx.lineTo(i * itemWidth, canvasWidth)
+        }
+        ctx.lineWidth = 1
+        ctx.strokeStyle = '#ddd'
+        ctx.stroke()
+    }
+    grawGrid()
+
+    // 绘制函数
+    const draw = function() {
+        ctx.clearRect(0, 0, canvasHeight, canvasWidth)
+
+        grawGrid()
+
+        // 绘制食物
+        ctx.fillStyle="#FFB433"
+        ctx.fillRect(
+            food[0] * itemWidth + flashing,
+            food[1] * itemWidth + flashing,
+            itemWidth - flashing * 2,
+            itemWidth - flashing * 2 
+        )
+
+        // XOR异或运算 同值取0 异值取1
+        flashing ^= 1
+
+        // 绘制蛇头
+        ctx.fillStyle="#FF5733"
+        ctx.fillRect(
+            snake[0][0] * itemWidth + 0.5,
+            snake[0][1] * itemWidth + 0.5,
+            itemWidth - 1,
+            itemWidth - 1
+        )
+
+        // 绘制蛇身
+        ctx.fillStyle="#E4FF33"
+        for (let i = 1; i < snake.length; i++) {
+            ctx.fillRect(
+                snake[i][0] * itemWidth + 0.5,
+                snake[i][1] * itemWidth + 0.5,
+                itemWidth - 1,
+                itemWidth - 1
+            )
+        }
+    }
+
+    // 蛇的初始运动方向
+    let direction = 'right';
+
+    // 蛇的案件控制
+    const snakeControlListener = function() {
+        document.onkeydown = function(e) {
+            switch(e.keyCode) {
+            case 37:
+                if (direction !== 'right') {
+                    direction = 'left'
+                }
+                break
+            case 38:
+                if (direction !== 'down') {
+                    direction = 'up'
+                }
+                break
+            case 39:
+                if (direction !== 'left') {
+                    direction = 'right'
+                }
+                break
+            case 40:
+                if (this.direction !== 'up') {
+                    direction = 'down'
+                }
+                break
+            }
+        }
+    }
+
+    // 判断游戏是否结束
+    over = function([x, y]) {
+      if (x < 0 || x >= maxX || y < 0 || y >= maxY) {
+        return true
+      }
+      
+      if (snake.some(v => v[0] === x && v[1] === y)) {
+        return true
+      }
+    }
+
+    // 蛇的移动
+    const snakeMove = function(){
+        
+    }
+    // 蛇的自动运动
+    const snakeAutoMove = function(){
+        let [x, y] = snake[0]
+        switch(direction) {
+            case 'left':
+                x--
+                break
+            case 'right':
+                x++
+                break
+            case 'up':
+                y--
+                break
+            case 'down':
+                y++
+                break
+        }
+
+        // 是否吃到食物
+        if(x === food[0] && y === food[1]){
+            makeFood()
+            addScore()
+        } else {
+            snake.pop()
+        }
+        // 结束判断
+        if(over([x, y])){
+            clearInterval(timer)
+            return 
+        }
+        snake.unshift([x, y])
+    }
+
+    // 初始化
+    snakeControlListener()
+
+    // 蛇的爬行
+    let timer = null
+
+    const startGame = function() {
+        if(timer) {
+            clearInterval(timer)
+        }
+
+        // 变量清空
+        snake = [
+            [6, 12],
+            [5, 12],
+            [4, 12],
+            [3, 12],
+            [2, 12]
+        ]
+        initscore = 0
+
+        timer = setInterval(()=>{
+            draw()
+            snakeAutoMove()
+        }, snakeSpeed)
+    }
+    
+</script>
+</html>
