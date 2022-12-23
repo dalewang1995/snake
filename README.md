@@ -12,7 +12,9 @@ snake game (简单版贪吃蛇小游戏、使用js和canvas制作)
 - 蛇有固定的初始速度
 - 方向的改变用键盘的方向键控制，不能直接往反方向转向
 
-表格生成
+## 表格生成
+
+```
     const grawGrid = function() {
         // 绘制 网格 横线
         for (let i = 1; i < maxY; i++) {
@@ -29,8 +31,12 @@ snake game (简单版贪吃蛇小游戏、使用js和canvas制作)
         ctx.strokeStyle = '#ddd'
         ctx.stroke()
     }
+```
 
-食物的生成
+## 食物的生成
+
+
+```
         // 绘制食物
         ctx.fillStyle="#FFB433"
         ctx.fillRect(
@@ -42,8 +48,12 @@ snake game (简单版贪吃蛇小游戏、使用js和canvas制作)
 
         // XOR异或运算 同值取0 异值取1 （食物的闪缩效果）
         flashing ^= 1
+        
+ ```
 
-蛇的生成
+## 蛇的生成
+
+```
         // 绘制蛇头
         ctx.fillStyle="#FF5733"
         ctx.fillRect(
@@ -63,8 +73,11 @@ snake game (简单版贪吃蛇小游戏、使用js和canvas制作)
                 itemWidth - 1
             )
         }
+ ```
 
-蛇的运动和成长
+## 蛇的运动和成长
+
+```
     // 蛇的自动运动
     const snakeAutoMove = function(){
         let [x, y] = snake[0]
@@ -97,15 +110,22 @@ snake game (简单版贪吃蛇小游戏、使用js和canvas制作)
         }
         snake.unshift([x, y])
     }
-蛇的运动
+```
+
+## 蛇的运动
+
 主要是采用定时器的写法，配合canvas不断刷新，显示出运动的效果
+```
         timer = setInterval(()=>{
           // 绘制图像
             draw()
           // 改变蛇的位置
             snakeAutoMove()
         }, snakeSpeed)
-方向控制
+ ```
+## 方向控制
+
+```
     // 蛇的案件控制
     const snakeControlListener = function() {
         document.onkeydown = function(e) {
@@ -133,3 +153,4 @@ snake game (简单版贪吃蛇小游戏、使用js和canvas制作)
             }
         }
     }
+```
